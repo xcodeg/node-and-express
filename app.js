@@ -1,6 +1,9 @@
 import express from 'express';
-import students from './data/students.json'
-import _ from 'lodash'
+import morgan from 'morgan';
+import StudentRoute from './routes/StudentRoute';
+import students from './data/students.json';
+import _ from 'lodash';
+import bodyParser from 'body-parser';
 
 const PORT = 3000;
 
@@ -9,34 +12,10 @@ const STUDENTS_BASE_URL = buildUrl('v1', 'students');
 
 const server = express();
 
-server.get('STUDENTS_BASE_URL', (req, res) => {
-    res.json(students);
-});
+server.use(morgan('tiny'));
+server.use(bodyParser.json());
 
-server.get(`${STUDENTS_BASE_URL}/:id`, (req, res) => {
-    const student = _.find(students, student => student.id == req.params.id);
-    if (student) {
-        res.json(student);
-    } else {
-        res.send(`User ${req.params.id} not found`)
-    }
-});
-
-server.post(STUDENTS_BASE_URL, (req, res) => {
-    console.log(req.params.id);
-    res.end();
-});
-
-server.put(STUDENTS_BASE_URL, (req, res) => {
-    console.log("Handling PUT request...");
-    res.end();
-});
-
-server.delete(STUDENTS_BASE_URL, (req, res) => {
-    console.log("Handling DELETE request...");
-    res.end();
-});
-
+server.use(STUDENTS_BASE_URL, StudentRoute)
 
 server.get('/route-handlers', (req, res, next) => {
     res.send("learning route handlers is cool");
